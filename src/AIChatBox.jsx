@@ -8,7 +8,7 @@ const AIChatBox = () => {
   const [userMessage, setUserMessage] = useState('');
   const [chatLog, setChatLog] = useState([
     { sender: 'bot', text: 'Hi! I’m your AI assistant. How can I help you today?' }
-  ]);
+  ]); 
 
   const toggleChat = () => setIsOpen(!isOpen);
 
