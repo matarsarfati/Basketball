@@ -1,10 +1,11 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import tailwindcss from 'tailwindcss'; // import tailwindcss plugin
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
-  css: {
-    postcss: './postcss.config.js', // ✅ טוען את Tailwind דרך PostCSS
-  },
+  plugins: [
+    react(),
+    tailwindcss(), // add tailwindcss plugin here
+  ],
 });
