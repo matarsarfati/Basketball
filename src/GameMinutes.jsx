@@ -26,6 +26,26 @@ const GameMinutes = () => {
   const [isRunning, setIsRunning] = useState(false);
   const [selectedOpponent, setSelectedOpponent] = useState(''); // שמירת שם הקבוצה היריבה
 
+  const togglePlayer = (playerName) => {
+    setPlayers((prevPlayers) =>
+      prevPlayers.map((player) =>
+        player.name === playerName
+          ? { ...player, onCourt: !player.onCourt }
+          : player
+      )
+    );
+  };
+
+  const toggleOpponentPlayer = (playerName) => {
+    setOpponents((prevOpponents) =>
+      prevOpponents.map((player) =>
+        player.name === playerName
+          ? { ...player, onCourt: !player.onCourt }
+          : player
+      )
+    );
+  };
+  
   useEffect(() => {
     // טעינת השחקנים מהlocalStorage
     const savedPlayers = JSON.parse(localStorage.getItem('myTeam')) || [];
@@ -34,6 +54,7 @@ const GameMinutes = () => {
     const savedOpponent = JSON.parse(localStorage.getItem('selectedOpponent')) || '';
     setSelectedOpponent(savedOpponent);
 
+   
     // טעינת השחקנים של הקבוצה היריבה מהlocalStorage
     const savedOpponents = JSON.parse(localStorage.getItem('opponentTeam')) || [];
     setOpponents(savedOpponents);
