@@ -175,10 +175,10 @@ const GameMinutes = () => {
                     <td className="px-4 py-2 text-center">
                       {player.onCourt ? "✅" : "❌"}
                     </td>
-                    <td className="px-4 py-2 text-center">{formatMMSS(player.timePlayed)}</td>
+                    <td className="px-4 py-2 text-center">{formatMMSS(player.timePlayed||0)}</td>
                     <td className="px-4 py-2 text-center">{formatMMSS(player.totalTime || 0)}</td>
-                    <td className="px-4 py-2 text-center">{formatMMSS(player.restTime)}</td>
-                    <td className="px-4 py-2 text-center">{formatMMSS(player.continuousRest)}</td>
+                    <td className="px-4 py-2 text-center">{formatMMSS(player.restTime||0)}</td>
+                    <td className="px-4 py-2 text-center">{formatMMSS(player.continuousRest||0)}</td>
                     <td className="px-4 py-2 text-center">{player.fouls}</td>
                     <td className="px-4 py-2 text-center">{player.points}</td>
                     <td className="px-4 py-2 text-center">
