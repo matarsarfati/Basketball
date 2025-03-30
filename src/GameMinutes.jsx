@@ -113,10 +113,9 @@ const GameMinutes = () => {
             <div className="flex flex-wrap gap-3 justify-center">
               <button
                 onClick={() => {
-                  setIsRunning(!isRunning);
-                  if (!isRunning) {
-                    setTime(600); // אם מתחילים את השעון מחדש, מאפסים את הזמן של המשחק
-                  }
+
+  setIsRunning((prev) => !prev); // אם מתחילים את השעון מחדש, מאפסים את הזמן של המשחק
+                  
                 }}
                 className={`${isRunning ? "bg-red-500" : "bg-green-500"} text-white px-4 py-2 rounded-xl text-lg font-semibold transition duration-300`}
               >
