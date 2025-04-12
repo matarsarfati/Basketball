@@ -31,7 +31,7 @@ const WorkoutPerformModal = ({
       blockId: block.id,
       notes: '',
       exercises: block.exercises.map(exercise => ({
-        exerciseId: exercise.id,
+        exerciseId: exercise.exerciseId,
         actualSets: exercise.sets,
         actualReps: exercise.reps,
         actualWeight: exercise.weight,
@@ -148,7 +148,7 @@ const WorkoutPerformModal = ({
   // Find the original exercise details from the workout plan
   const findExerciseInPlan = (exerciseId) => {
     for (const block of workoutPlan.blocks) {
-      const exercise = block.exercises.find(e => e.id === exerciseId);
+      const exercise = block.exercises.find(e => e.exerciseId === exerciseId);
       if (exercise) return exercise;
     }
     return null;

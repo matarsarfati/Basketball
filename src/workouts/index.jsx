@@ -5,6 +5,7 @@
  * - Workout planning
  * - Training automation
  * - Load management
+ * - Performance tracking and analysis
  */
 
 // Export exercise-related components
@@ -14,7 +15,11 @@ export { default as ExerciseLibrary } from './exercises/ExerciseLibrary';
 // Export workout planner components
 export { default as WorkoutPlanner } from './planner/WorkoutPlanner';
 
+// Export workout history and performance components
+export { default as WorkoutHistory } from './history/WorkoutHistory';
+export { default as WorkoutPerformModal } from './planner/WorkoutPerformModal';
+export { default as ActualPerformanceComparison } from './history/ActualPerformanceComparison';
+export { default as WorkoutLoadComparison } from './history/WorkoutLoadComparison';
+
 // Future exports (to be implemented)
-// export { default as WorkoutHistory } from './history/WorkoutHistory';
 // export { default as WorkoutCalendar } from './calendar/WorkoutCalendar';
-// export { default as LoadManagement } from './load/LoadManagement';

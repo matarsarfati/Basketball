@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { formatDate } from '../../shared/utils/dateUtils';
 import { useWorkoutContext } from '../../context/WorkoutContext';
+import ActualPerformanceComparison from './ActualPerformanceComparison';
+import WorkoutPerformModal from '../planner/WorkoutPerformModal';
 
 /**
  * WorkoutHistory Component
@@ -10,12 +12,20 @@ import { useWorkoutContext } from '../../context/WorkoutContext';
  * - View saved workout plans
  * - See if a workout has been performed
  * - View performance metrics (duration, RPE)
+ * - Log or view actual performance data
  * - Load a plan for editing
  * - Delete or duplicate a plan
  */
 const WorkoutHistory = ({ playerId }) => {
   const navigate = useNavigate();
   const { getPlayerWorkoutPlans, loadWorkoutPlan, deleteWorkoutPlan, duplicateWorkoutPlan } = useWorkoutContext();
+  
+  // State for workout comparison view
+  const [selectedWorkout, setSelectedWorkout] = useState(null);
+  
+  // State for perform workout modal
+  const [showPerformModal, setShowPerformModal] = useState(false);
+  const [workoutToPerform, setWorkoutToPerform] = useState(null);
   
   // Get all workout plans for this player
   const playerWorkouts = getPlayerWorkoutPlans(playerId);
@@ -54,13 +64,13 @@ const WorkoutHistory = ({ playerId }) => {
         const actualBlock = workout.actualPerformance.blocks.find(b => b.blockId === block.id);
         if (!actualBlock) return;
         
-        const actualExercise = actualBlock.exercises.find(e => e.exerciseId === exercise.id);
+        const actualExercise = actualBlock.exercises.find(e => e.exerciseId === exercise.exerciseId);
         if (!actualExercise) return;
         
         // Calculate actual volume (sets * reps * weight)
         actualVolume += (actualExercise.actualSets || 0) * 
-                        (actualExercise.actualReps || 0) * 
-                        (actualExercise.actualWeight || 0);
+                      (actualExercise.actualReps || 0) * 
+                      (actualExercise.actualWeight || 0);
       });
     });
     
@@ -89,6 +99,22 @@ const WorkoutHistory = ({ playerId }) => {
     duplicateWorkoutPlan(planId);
   };
   
+  // Handle logging performance for a workout
+  const handleLogPerformance = (workout) => {
+    setWorkoutToPerform(workout);
+    setShowPerformModal(true);
+  };
+  
+  // Handle viewing performance comparison
+  const handleViewPerformance = (workout) => {
+    setSelectedWorkout(workout);
+  };
+  
+  // Close performance comparison view
+  const closePerformanceView = () => {
+    setSelectedWorkout(null);
+  };
+  
   // If no workouts, show a message
   if (sortedWorkouts.length === 0) {
     return (
@@ -105,6 +131,35 @@ const WorkoutHistory = ({ playerId }) => {
             Create New Workout
           </button>
         </div>
+      </div>
+    );
+  }
+  
+  // When a workout is selected for performance comparison
+  if (selectedWorkout) {
+    return (
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div className="flex justify-between items-center mb-6 border-b border-gray-200 pb-2">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-700">
+              Performance Analysis: {selectedWorkout.name}
+            </h3>
+            <p className="text-sm text-gray-500">
+              {formatDate(selectedWorkout.actualPerformance?.date || selectedWorkout.targetDate)}
+            </p>
+          </div>
+          <button
+            onClick={closePerformanceView}
+            className="px-3 py-1 bg-gray-200 text-gray-700 text-sm rounded-md hover:bg-gray-300 flex items-center"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+            </svg>
+            Back to Workout List
+          </button>
+        </div>
+        
+        <ActualPerformanceComparison workout={selectedWorkout} />
       </div>
     );
   }
@@ -208,11 +263,35 @@ const WorkoutHistory = ({ playerId }) => {
                   >
                     Delete
                   </button>
+                  
+                  {/* Log Performance Button */}
+                  <button
+                    onClick={() => handleLogPerformance(workout)}
+                    className={`px-3 py-1 text-sm rounded-md ${
+                      hasPerformed 
+                        ? 'bg-green-600 hover:bg-green-700 text-white' 
+                        : 'bg-purple-600 hover:bg-purple-700 text-white'
+                    }`}
+                  >
+                    {hasPerformed ? 'Update Performance' : 'Log Performance'}
+                  </button>
+                  
+                  {/* View Performance Button (only if performed) */}
+                  {hasPerformed && (
+                    <button
+                      onClick={() => handleViewPerformance(workout)}
+                      className="px-3 py-1 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700"
+                    >
+                      View Analysis
+                    </button>
+                  )}
+                  
+                  {/* Edit Workout Button */}
                   <button
                     onClick={() => handleLoadWorkout(workout.id)}
                     className="px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700"
                   >
-                    {hasPerformed ? 'View/Edit' : 'Load'}
+                    Edit Workout
                   </button>
                 </div>
               </div>
@@ -220,6 +299,15 @@ const WorkoutHistory = ({ playerId }) => {
           );
         })}
       </div>
+      
+      {/* Workout Performance Modal */}
+      {showPerformModal && workoutToPerform && (
+        <WorkoutPerformModal
+          isOpen={showPerformModal}
+          onClose={() => setShowPerformModal(false)}
+          workoutPlan={workoutToPerform}
+        />
+      )}
     </div>
   );
 };

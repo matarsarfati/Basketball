@@ -4,6 +4,7 @@ import PhysicalDataForm from './PhysicalDataForm';
 import PlayerProfileCompactRM from './PlayerProfileCompactRM';
 import WorkoutHistory from '../workouts/history/WorkoutHistory';
 import PlayerLoad from './PlayerLoad';
+import WorkoutLoadComparison from '../workouts/history/WorkoutLoadComparison';
 
 /**
  * PlayerProfile Component
@@ -14,6 +15,7 @@ import PlayerLoad from './PlayerLoad';
  * - Performance metrics (RM data)
  * - Workout history and performance
  * - Load monitoring and management
+ * - Performance tracking and analysis
  * - Injury history
  */
 const PlayerProfile = ({ player, onUpdatePlayer }) => {
@@ -98,6 +100,16 @@ const PlayerProfile = ({ player, onUpdatePlayer }) => {
             }`}
           >
             Workouts
+          </button>
+          <button
+            onClick={() => setActiveTab('tracking')}
+            className={`py-2 px-2 text-sm font-medium ${
+              activeTab === 'tracking'
+                ? 'text-blue-600 border-b-2 border-blue-600'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Tracking
           </button>
           <button
             onClick={() => setActiveTab('load')}
@@ -305,6 +317,11 @@ const PlayerProfile = ({ player, onUpdatePlayer }) => {
         {/* Workouts Tab Content */}
         {activeTab === 'workouts' && (
           <WorkoutHistory playerId={player.id} />
+        )}
+        
+        {/* Tracking Tab Content */}
+        {activeTab === 'tracking' && (
+          <WorkoutLoadComparison playerId={player.id} />
         )}
         
         {/* Load Tab Content */}

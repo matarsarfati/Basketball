@@ -1,7 +1,10 @@
+// Path: src/gym/GymPage.jsx
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import exerciseData, { getAllMuscleGroups } from '../workouts/exercises/exerciseData';
 import { useWorkoutContext } from '../context/WorkoutContext';
+import ExerciseCard from './components/ExerciseCard';
 
 /**
  * GymPage Component
@@ -96,10 +99,7 @@ const GymPage = () => {
   };
   
   // Handle adding exercise to workout
-  const handleAddToWorkout = (exercise, event) => {
-    // Prevent event bubbling (if inside a clickable card)
-    event.stopPropagation();
-    
+  const handleAddToWorkout = (exercise) => {
     // Add exercise to pending in context
     addExerciseToPending(exercise);
     
@@ -122,64 +122,34 @@ const GymPage = () => {
   });
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6">Exercise Library</h1>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8 text-gray-800">Exercise Library</h1>
       
       {/* Muscle Group Sections */}
       {muscleGroups.map(muscleGroup => (
-        <div key={muscleGroup} className="mb-8">
-          <h2 className="text-xl font-semibold mb-4 border-b border-gray-200 pb-2">
+        <div key={muscleGroup} className="mb-12">
+          <h2 className="text-2xl font-semibold mb-6 border-b-2 border-blue-400 pb-2 text-gray-700">
             {getRegionForMuscle(muscleGroup)} - {muscleGroup}
           </h2>
           
-          {/* Scrollable Exercise Cards */}
-          <div className="flex overflow-x-auto pb-4 space-x-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+          {/* Exercise Cards Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {groupedExercises[muscleGroup].map(exercise => (
               <div 
-                key={`${exercise.id}-${muscleGroup}`} 
-                className={`flex-none w-64 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 ${
-                  exercise.isSecondary ? 'border-l-4 border-blue-400' : ''
-                }`}
+                key={`${exercise.id}-${muscleGroup}`}
+                className={exercise.isSecondary ? 'border-l-4 border-blue-400' : ''}
               >
-                {/* Exercise Image */}
-                <div 
-                  className="h-40 bg-gray-200 bg-cover bg-center"
-                  style={{ backgroundImage: `url(${exercise.imagePath})` }}
-                >
-                  {/* Fallback if image doesn't load */}
-                  <div className="w-full h-full flex items-center justify-center bg-gray-100 bg-opacity-70 opacity-0 hover:opacity-100 transition-opacity duration-300">
-                    <span className="text-gray-800 font-medium p-2 text-center">{exercise.name}</span>
-                  </div>
-                </div>
+                <ExerciseCard 
+                  exercise={exercise} 
+                  onAddToWorkout={handleAddToWorkout} 
+                />
                 
-                {/* Exercise Name and Info */}
-                <div className="p-3">
-                  <h3 className="font-bold text-lg mb-1 truncate">{exercise.name}</h3>
-                  
-                  <div className="flex flex-wrap gap-1 mb-2">
-                    <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
-                      {exercise.category}
-                    </span>
-                    <span className="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full truncate">
-                      {exercise.equipment}
-                    </span>
+                {/* Secondary muscle indicator */}
+                {exercise.isSecondary && (
+                  <div className="mt-1 text-xs text-blue-600 font-medium px-2">
+                    Secondary target muscle
                   </div>
-                  
-                  {exercise.isSecondary && (
-                    <p className="text-xs text-gray-500 italic mb-2">Secondary target muscle</p>
-                  )}
-                  
-                  {/* Add to Workout Button */}
-                  <button
-                    onClick={(e) => handleAddToWorkout(exercise, e)}
-                    className="w-full mt-2 px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-                    </svg>
-                    Add to Workout
-                  </button>
-                </div>
+                )}
               </div>
             ))}
           </div>
