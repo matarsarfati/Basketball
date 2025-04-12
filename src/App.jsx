@@ -21,20 +21,23 @@ function App() {
     <PlayerProvider>
       <WorkoutProvider>
         <Router>
-          <div className="min-h-screen flex flex-col bg-gray-100">
+        <div className="p-4 m-4 bg-blue-500 text-white rounded">
+            This div should be blue with white text if Tailwind is working
+          </div>
+          <div className="min-h-screen flex flex-col bg-gray-50">
             {/* Header with Navigation */}
-            <header className="bg-blue-800 text-white shadow-md">
+            <header className="bg-israel-blue text-white shadow-md">
               <div className="container mx-auto px-4">
                 <div className="flex flex-col md:flex-row md:justify-between md:items-center py-4">
-                  <h1 className="text-2xl font-bold mb-4 md:mb-0">Basketball Team Management System</h1>
+                  <h1 className="text-2xl font-bold mb-4 md:mb-0">Basketball Team Management</h1>
                   
                   <nav className="flex flex-wrap gap-1 md:gap-2">
                     <Link 
                       to="/" 
                       className={`px-3 py-2 rounded-md text-sm font-medium ${
                         activeLink === '/' 
-                          ? 'bg-blue-900 text-white' 
-                          : 'text-blue-100 hover:bg-blue-700'
+                          ? 'bg-israel-blue-dark text-white' 
+                          : 'text-white hover:bg-israel-blue-light'
                       }`}
                       onClick={() => handleLinkClick('/')}
                     >
@@ -44,8 +47,8 @@ function App() {
                       to="/profile" 
                       className={`px-3 py-2 rounded-md text-sm font-medium ${
                         activeLink === '/profile' 
-                          ? 'bg-blue-900 text-white' 
-                          : 'text-blue-100 hover:bg-blue-700'
+                          ? 'bg-israel-blue-dark text-white' 
+                          : 'text-white hover:bg-israel-blue-light'
                       }`}
                       onClick={() => handleLinkClick('/profile')}
                     >
@@ -55,8 +58,8 @@ function App() {
                       to="/workouts" 
                       className={`px-3 py-2 rounded-md text-sm font-medium ${
                         activeLink === '/workouts' 
-                          ? 'bg-blue-900 text-white' 
-                          : 'text-blue-100 hover:bg-blue-700'
+                          ? 'bg-israel-blue-dark text-white' 
+                          : 'text-white hover:bg-israel-blue-light'
                       }`}
                       onClick={() => handleLinkClick('/workouts')}
                     >
@@ -66,8 +69,8 @@ function App() {
                       to="/gym" 
                       className={`px-3 py-2 rounded-md text-sm font-medium ${
                         activeLink === '/gym' 
-                          ? 'bg-blue-900 text-white' 
-                          : 'text-blue-100 hover:bg-blue-700'
+                          ? 'bg-israel-blue-dark text-white' 
+                          : 'text-white hover:bg-israel-blue-light'
                       }`}
                       onClick={() => handleLinkClick('/gym')}
                     >
@@ -89,7 +92,7 @@ function App() {
             </main>
             
             {/* Footer */}
-            <footer className="bg-gray-200 p-4 text-center text-gray-600 mt-auto">
+            <footer className="bg-gray-100 p-4 text-center text-gray-600 mt-auto border-t border-gray-200">
               <p>Basketball Team Management System &copy; {new Date().getFullYear()}</p>
             </footer>
           </div>
