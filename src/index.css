@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom variables for legacy class usage */
+:root {
+  --color-israel-blue: #0038b8;
+  --color-israel-blue-dark: #002d93;
+  --color-israel-blue-light: #0046e5;
+}

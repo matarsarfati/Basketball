@@ -5,7 +5,13 @@ export default {
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        'israel-blue': '#0038b8',
+        'israel-blue-dark': '#002d93',
+        'israel-blue-light': '#0046e5',
+      },
+    },
   },
   plugins: [],
 }
