@@ -28,6 +28,7 @@ export { default as WeeklyPlannerHeader } from './planning/WeeklyPlannerHeader';
 export { default as WeeklyPlannerRow } from './planning/WeeklyPlannerRow';
 export { default as SessionCell } from './planning/SessionCell';
 export { default as WeekSelector } from './planning/WeekSelector';
+export { default as WeeklyLoadChart } from './planning/components/WeeklyLoadChart';
 
 // Future exports (to be implemented)
 // export { default as WorkoutCalendar } from './calendar/WorkoutCalendar';
