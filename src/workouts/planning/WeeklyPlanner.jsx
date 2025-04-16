@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useWeeklyPlanningContext } from '../../context/WeeklyPlanningContext';
 import WeeklyPlannerHeader from './WeeklyPlannerHeader';
 import WeeklyPlannerRow from './WeeklyPlannerRow';
-import WeekSelector from '../planner/WeekSelector';
+import WeekSelector from './WeekSelector';
 
 /**
  * WeeklyPlanner Component
