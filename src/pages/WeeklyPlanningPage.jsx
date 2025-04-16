@@ -1,5 +1,5 @@
 import React from 'react';
-import { WeeklyPlanner } from '../workouts/planning';
+import { WeeklyPlanner } from '../workouts';
 
 /**
  * WeeklyPlanningPage Component
