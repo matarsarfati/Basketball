@@ -1,6 +1,6 @@
 // src/workouts/planning/WeeklyPlannerRow.jsx
 import React from 'react';
-import SessionCell from './SessionCell';
+import SessionCell from '../planner/SessionCell';
 import { useWeeklyPlanningContext } from '../../context/WeeklyPlanningContext';
 
 /**

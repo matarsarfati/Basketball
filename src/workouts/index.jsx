@@ -24,6 +24,10 @@ export { default as WorkoutLoadComparison } from './history/WorkoutLoadCompariso
 
 // Export weekly planning components
 export { default as WeeklyPlanner } from './planning/WeeklyPlanner';
+export { default as WeeklyPlannerHeader } from './planning/WeeklyPlannerHeader';
+export { default as WeeklyPlannerRow } from './planning/WeeklyPlannerRow';
+export { default as SessionCell } from './planning/SessionCell';
+export { default as WeekSelector } from './planning/WeekSelector';
 
 // Future exports (to be implemented)
 // export { default as WorkoutCalendar } from './calendar/WorkoutCalendar';
