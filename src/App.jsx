@@ -9,6 +9,8 @@ import GymPage from './gym/GymPage';
 import HomePage from './pages/HomePage';
 import WeeklyPlanningPage from './pages/WeeklyPlanningPage';
 import './App.css';
+import BasicFlowGraph from './components/BasicFlowGraph';
+
 
 function App() {
   // Active link state for navigation styling
@@ -77,6 +79,17 @@ function App() {
                         }`}
                         onClick={() => handleLinkClick('/weekly-planning')}
                       >
+                        <Link 
+  to="/flow-analysis" 
+  className={`px-3 py-2 rounded-md text-sm font-medium ${
+    activeLink === '/flow-analysis' 
+      ? 'bg-israel-blue-dark text-white' 
+      : 'text-white hover:bg-israel-blue-light'
+  }`}
+  onClick={() => handleLinkClick('/flow-analysis')}
+>
+  Flow Analysis
+</Link>
                         Weekly Planning
                       </Link>
                       <Link 
@@ -103,6 +116,7 @@ function App() {
                   <Route path="/workouts" element={<WorkoutPlanner />} />
                   <Route path="/gym" element={<GymPage />} />
                   <Route path="/weekly-planning" element={<WeeklyPlanningPage />} />
+                  <Route path="/flow-analysis" element={<BasicFlowGraph />} />
                 </Routes>
               </main>
               
