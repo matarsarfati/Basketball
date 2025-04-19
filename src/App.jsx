@@ -8,7 +8,6 @@ import { WorkoutPlanner } from './workouts';
 import GymPage from './gym/GymPage';
 import HomePage from './pages/HomePage';
 import WeeklyPlanningPage from './pages/WeeklyPlanningPage';
-import FlowStatePage from './pages/FlowStatePage'; // Import the new page
 import './App.css';
 
 function App() {
@@ -25,6 +24,9 @@ function App() {
       <WorkoutProvider>
         <WeeklyPlanningProvider>
           <Router>
+          <div className="p-4 m-4 bg-blue-500 text-white rounded">
+              This div should be blue with white text if Tailwind is working
+            </div>
             <div className="min-h-screen flex flex-col bg-gray-50">
               {/* Header with Navigation */}
               <header className="bg-israel-blue text-white shadow-md">
@@ -88,18 +90,6 @@ function App() {
                       >
                         Gym & Exercises
                       </Link>
-                      {/* New Flow State Analysis Link */}
-                      <Link 
-                        to="/flow-state" 
-                        className={`px-3 py-2 rounded-md text-sm font-medium ${
-                          activeLink === '/flow-state' 
-                            ? 'bg-israel-blue-dark text-white' 
-                            : 'text-white hover:bg-israel-blue-light'
-                        }`}
-                        onClick={() => handleLinkClick('/flow-state')}
-                      >
-                        Flow State Analysis
-                      </Link>
                     </nav>
                   </div>
                 </div>
@@ -113,7 +103,6 @@ function App() {
                   <Route path="/workouts" element={<WorkoutPlanner />} />
                   <Route path="/gym" element={<GymPage />} />
                   <Route path="/weekly-planning" element={<WeeklyPlanningPage />} />
-                  <Route path="/flow-state" element={<FlowStatePage />} /> {/* New Route */}
                 </Routes>
               </main>
               
