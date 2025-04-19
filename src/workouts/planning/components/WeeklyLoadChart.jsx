@@ -10,29 +10,14 @@ import { useWeeklyPlanningContext } from '../../../context/WeeklyPlanningContext
  * Helps coaches understand when training load increases or decreases across cycles.
  */
 const WeeklyLoadChart = () => {
-  const { weeklyPlans } = useWeeklyPlanningContext();
+  const { weeklyPlans, calculateWeeklyLoad } = useWeeklyPlanningContext();
   
-  // Calculate the training load for each week using intensity x duration
+  // Calculate the training load for each week
   const chartData = useMemo(() => {
     return weeklyPlans
       .map(week => {
-        // Initialize total load for the week
-        let totalLoad = 0;
-        
-        // Calculate sum of (intensity × duration) for all sessions in the week
-        week.days.forEach(day => {
-          // Process morning sessions
-          if (day.sessions.morning) {
-            const morningLoad = (day.sessions.morning.intensity || 0) * (day.sessions.morning.duration || 0);
-            totalLoad += morningLoad;
-          }
-          
-          // Process evening sessions
-          if (day.sessions.evening) {
-            const eveningLoad = (day.sessions.evening.intensity || 0) * (day.sessions.evening.duration || 0);
-            totalLoad += eveningLoad;
-          }
-        });
+        // Calculate total load for the week using the context function
+        const totalLoad = calculateWeeklyLoad(week.id);
         
         // Format the date for display
         const startDate = new Date(week.startDate);
@@ -56,7 +41,7 @@ const WeeklyLoadChart = () => {
         const weekB = weeklyPlans.find(w => w.id === b.weekId);
         return new Date(weekA.startDate) - new Date(weekB.startDate);
       });
-  }, [weeklyPlans]);
+  }, [weeklyPlans, calculateWeeklyLoad]);
   
   // Custom tooltip to display detailed information
   const CustomTooltip = ({ active, payload, label }) => {
@@ -70,7 +55,7 @@ const WeeklyLoadChart = () => {
             Total Load: {data.totalLoad.toFixed(0)} units
           </p>
           <p className="text-xs italic mt-1">
-            (Sum of intensity × duration across all sessions)
+            (Sum of intensity × duration for all sessions & drills)
           </p>
         </div>
       );
@@ -133,7 +118,6 @@ const WeeklyLoadChart = () => {
               strokeWidth={2}
               dot={{ strokeWidth: 2, r: 4 }}
               activeDot={{ r: 6 }}
-              // Use conditional color based on load level
               stroke={(entry) => getLineColor(entry)}
             />
           </LineChart>

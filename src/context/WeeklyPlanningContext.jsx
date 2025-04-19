@@ -1,215 +1,253 @@
 // src/context/WeeklyPlanningContext.jsx
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
-// Create the context
+// Create context
 const WeeklyPlanningContext = createContext();
 
-// Custom hook for using the context
-export const useWeeklyPlanningContext = () => {
-  const context = useContext(WeeklyPlanningContext);
-  if (!context) {
-    throw new Error('useWeeklyPlanningContext must be used within a WeeklyPlanningProvider');
-  }
-  return context;
-};
+// Empty session template
+const createEmptySession = () => ({
+  title: '',
+  description: '',
+  duration: 0,
+  intensity: 0,
+  status: 'planned',
+  drills: [],
+  numberOfFields: 1,
+  sequences: ''
+});
 
 // Provider component
 export const WeeklyPlanningProvider = ({ children }) => {
-  // State for weekly planning data
   const [weeklyPlans, setWeeklyPlans] = useState([]);
-  // State for the current active week
   const [currentWeekId, setCurrentWeekId] = useState(null);
-  // State for loading status
-  const [loading, setLoading] = useState(false);
-  // State for errors
-  const [error, setError] = useState(null);
-
-  // Load plans from localStorage on component mount
+  const [loading, setLoading] = useState(true);
+  
+  // Load data from localStorage on mount
   useEffect(() => {
-    const loadPlans = () => {
+    const loadWeeklyPlans = () => {
       try {
-        setLoading(true);
-        const savedPlans = localStorage.getItem('basketballTeamWeeklyPlans');
+        const savedPlans = localStorage.getItem('weeklyPlans');
+        const savedCurrentWeekId = localStorage.getItem('currentWeekId');
+        
         if (savedPlans) {
-          const parsedPlans = JSON.parse(savedPlans);
-          setWeeklyPlans(parsedPlans);
-          
-          // Set most recent week as current if none is selected
-          if (!currentWeekId && parsedPlans.length > 0) {
-            setCurrentWeekId(parsedPlans[parsedPlans.length - 1].id);
-          }
+          setWeeklyPlans(JSON.parse(savedPlans));
         }
+        
+        if (savedCurrentWeekId) {
+          setCurrentWeekId(savedCurrentWeekId);
+        }
+      } catch (error) {
+        console.error('Error loading weekly plans:', error);
+      } finally {
         setLoading(false);
-      } catch (err) {
-        setError('Failed to load weekly plans from storage');
-        setLoading(false);
-        console.error('Error loading weekly plans:', err);
       }
     };
-
-    loadPlans();
+    
+    loadWeeklyPlans();
   }, []);
-
-  // Save plans to localStorage whenever they change
+  
+  // Save data to localStorage when it changes
   useEffect(() => {
-    if (weeklyPlans.length > 0) {
-      localStorage.setItem('basketballTeamWeeklyPlans', JSON.stringify(weeklyPlans));
+    if (!loading) {
+      localStorage.setItem('weeklyPlans', JSON.stringify(weeklyPlans));
+      
+      if (currentWeekId) {
+        localStorage.setItem('currentWeekId', currentWeekId);
+      }
     }
-  }, [weeklyPlans]);
-
-  // Get the current week plan
-  const getCurrentWeekPlan = () => {
-    return weeklyPlans.find(plan => plan.id === currentWeekId) || null;
-  };
-
+  }, [weeklyPlans, currentWeekId, loading]);
+  
   // Create a new week plan
   const createWeekPlan = (startDate) => {
-    const weekStartDate = new Date(startDate);
+    // Ensure startDate is a Sunday
+    const date = new Date(startDate);
+    const day = date.getDay(); // 0 = Sunday, 1 = Monday, etc.
     
-    // Generate empty week structure with morning and evening sessions for each day
-    const weekDays = [];
+    // If not already a Sunday, adjust to the previous Sunday
+    if (day !== 0) {
+      date.setDate(date.getDate() - day);
+    }
+    
+    // Create end date (Saturday)
+    const endDate = new Date(date);
+    endDate.setDate(endDate.getDate() + 6);
+    
+    // Create days array (Sunday to Saturday)
+    const days = [];
+    const currentDate = new Date(date);
+    
     for (let i = 0; i < 7; i++) {
-      const currentDate = new Date(weekStartDate);
-      currentDate.setDate(weekStartDate.getDate() + i);
-      
-      weekDays.push({
-        date: currentDate.toISOString(),
-        dayOfWeek: i,
+      days.push({
+        date: new Date(currentDate).toISOString(),
         sessions: {
-          morning: {
-            id: `morning-${currentDate.toISOString()}`,
-            title: '',
-            description: '',
-            drills: [],
-            duration: 0,
-            intensity: 0,
-            status: 'planned', // planned, completed, canceled
-          },
-          evening: {
-            id: `evening-${currentDate.toISOString()}`,
-            title: '',
-            description: '',
-            drills: [],
-            duration: 0,
-            intensity: 0, 
-            status: 'planned',
-          }
+          morning: createEmptySession(),
+          evening: createEmptySession()
         }
       });
+      
+      currentDate.setDate(currentDate.getDate() + 1);
     }
-
-    const newWeek = {
-      id: `week-${Date.now()}`,
-      startDate: weekStartDate.toISOString(),
-      endDate: new Date(weekStartDate.getTime() + 6 * 24 * 60 * 60 * 1000).toISOString(),
-      title: `Week of ${weekStartDate.toLocaleDateString()}`,
-      days: weekDays,
-      totalPlannedLoad: 0,
-      totalActualLoad: 0,
+    
+    // Create the week plan
+    const weekPlan = {
+      id: uuidv4(),
+      title: `Week of ${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`,
+      startDate: date.toISOString(),
+      endDate: endDate.toISOString(),
+      days
     };
-
-    setWeeklyPlans(prev => [...prev, newWeek]);
-    setCurrentWeekId(newWeek.id);
-    return newWeek;
+    
+    // Add to weekly plans
+    setWeeklyPlans(prev => [...prev, weekPlan]);
+    setCurrentWeekId(weekPlan.id);
+    
+    return weekPlan.id;
   };
-
-  // Update a session within a week
-  const updateSession = (weekId, dayIndex, sessionType, sessionData) => {
-    setWeeklyPlans(prev => 
-      prev.map(week => {
-        if (week.id === weekId) {
-          const updatedDays = [...week.days];
-          updatedDays[dayIndex] = {
-            ...updatedDays[dayIndex],
-            sessions: {
-              ...updatedDays[dayIndex].sessions,
-              [sessionType]: {
-                ...updatedDays[dayIndex].sessions[sessionType],
-                ...sessionData
-              }
-            }
-          };
-          
-          return {
-            ...week,
-            days: updatedDays
-          };
-        }
-        return week;
-      })
-    );
-  };
-
+  
   // Delete a week plan
   const deleteWeekPlan = (weekId) => {
     setWeeklyPlans(prev => prev.filter(week => week.id !== weekId));
     
-    // If we deleted the current week, set a new current week
-    if (currentWeekId === weekId) {
-      const remainingPlans = weeklyPlans.filter(week => week.id !== weekId);
-      if (remainingPlans.length > 0) {
-        setCurrentWeekId(remainingPlans[remainingPlans.length - 1].id);
+    // If the deleted week was current, set to the most recent week
+    if (weekId === currentWeekId) {
+      const remainingWeeks = weeklyPlans.filter(week => week.id !== weekId);
+      if (remainingWeeks.length > 0) {
+        // Sort by start date and select the most recent
+        const sortedWeeks = [...remainingWeeks].sort(
+          (a, b) => new Date(b.startDate) - new Date(a.startDate)
+        );
+        setCurrentWeekId(sortedWeeks[0].id);
       } else {
         setCurrentWeekId(null);
       }
     }
   };
-
+  
   // Duplicate a week plan
-  const duplicateWeekPlan = (weekId, newStartDate) => {
+  const duplicateWeekPlan = (weekId) => {
     const weekToDuplicate = weeklyPlans.find(week => week.id === weekId);
-    if (!weekToDuplicate) return null;
     
-    const newWeekStartDate = newStartDate || new Date();
+    if (!weekToDuplicate) return;
     
-    // Create a deep copy with new IDs and dates
-    const newWeek = {
-      ...JSON.parse(JSON.stringify(weekToDuplicate)),
-      id: `week-${Date.now()}`,
-      startDate: newWeekStartDate.toISOString(),
-      endDate: new Date(newWeekStartDate.getTime() + 6 * 24 * 60 * 60 * 1000).toISOString(),
-      title: `Week of ${newWeekStartDate.toLocaleDateString()} (Copy)`,
-    };
+    // Create a new date for the next week
+    const startDate = new Date(weekToDuplicate.startDate);
+    startDate.setDate(startDate.getDate() + 7);
     
-    // Update the dates for each day
-    newWeek.days = newWeek.days.map((day, index) => {
-      const dayDate = new Date(newWeekStartDate);
-      dayDate.setDate(newWeekStartDate.getDate() + index);
+    const endDate = new Date(weekToDuplicate.endDate);
+    endDate.setDate(endDate.getDate() + 7);
+    
+    // Deep clone the days array
+    const days = weekToDuplicate.days.map(day => {
+      const dayDate = new Date(day.date);
+      dayDate.setDate(dayDate.getDate() + 7);
       
       return {
-        ...day,
         date: dayDate.toISOString(),
         sessions: {
-          morning: {
-            ...day.sessions.morning,
-            id: `morning-${dayDate.toISOString()}`
-          },
-          evening: {
-            ...day.sessions.evening,
-            id: `evening-${dayDate.toISOString()}`
-          }
+          morning: { ...day.sessions.morning },
+          evening: { ...day.sessions.evening }
         }
       };
     });
     
-    setWeeklyPlans(prev => [...prev, newWeek]);
-    return newWeek;
+    // Create the new week plan
+    const newWeekPlan = {
+      id: uuidv4(),
+      title: `Week of ${startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} (Copy)`,
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
+      days
+    };
+    
+    // Add to weekly plans
+    setWeeklyPlans(prev => [...prev, newWeekPlan]);
+    setCurrentWeekId(newWeekPlan.id);
+    
+    return newWeekPlan.id;
   };
-
+  
+  // Update a session
+  const updateSession = (weekId, dayIndex, sessionType, sessionData) => {
+    setWeeklyPlans(prev => prev.map(week => {
+      if (week.id !== weekId) return week;
+      
+      const updatedDays = [...week.days];
+      updatedDays[dayIndex] = {
+        ...updatedDays[dayIndex],
+        sessions: {
+          ...updatedDays[dayIndex].sessions,
+          [sessionType]: sessionData
+        }
+      };
+      
+      return {
+        ...week,
+        days: updatedDays
+      };
+    }));
+  };
+  
+  // Get the current week plan
+  const getCurrentWeekPlan = () => {
+    if (!currentWeekId) return null;
+    return weeklyPlans.find(week => week.id === currentWeekId) || null;
+  };
+  
+  // Calculate total planned load for a week
+  const calculateWeeklyLoad = (weekId) => {
+    const week = weeklyPlans.find(w => w.id === weekId);
+    if (!week) return 0;
+    
+    let totalLoad = 0;
+    
+    week.days.forEach(day => {
+      // Process morning sessions
+      if (day.sessions.morning) {
+        totalLoad += (day.sessions.morning.intensity || 0) * (day.sessions.morning.duration || 0);
+        
+        // Add drill-based load if there are drills
+        if (day.sessions.morning.drills && day.sessions.morning.drills.length > 0) {
+          day.sessions.morning.drills.forEach(drill => {
+            if (drill.plannedIntensity) {
+              totalLoad += drill.plannedIntensity * (drill.totalTime || 0);
+            }
+          });
+        }
+      }
+      
+      // Process evening sessions
+      if (day.sessions.evening) {
+        totalLoad += (day.sessions.evening.intensity || 0) * (day.sessions.evening.duration || 0);
+        
+        // Add drill-based load if there are drills
+        if (day.sessions.evening.drills && day.sessions.evening.drills.length > 0) {
+          day.sessions.evening.drills.forEach(drill => {
+            if (drill.plannedIntensity) {
+              totalLoad += drill.plannedIntensity * (drill.totalTime || 0);
+            }
+          });
+        }
+      }
+    });
+    
+    return totalLoad;
+  };
+  
   // Context value
   const value = {
     weeklyPlans,
     currentWeekId,
+    loading,
     setCurrentWeekId,
-    getCurrentWeekPlan,
     createWeekPlan,
-    updateSession,
     deleteWeekPlan,
     duplicateWeekPlan,
-    loading,
-    error,
+    updateSession,
+    getCurrentWeekPlan,
+    calculateWeeklyLoad
   };
-
+  
   return (
     <WeeklyPlanningContext.Provider value={value}>
       {children}
@@ -217,4 +255,13 @@ export const WeeklyPlanningProvider = ({ children }) => {
   );
 };
 
-export default WeeklyPlanningContext;
+// Custom hook for using the context
+export const useWeeklyPlanningContext = () => {
+  const context = useContext(WeeklyPlanningContext);
+  
+  if (!context) {
+    throw new Error('useWeeklyPlanningContext must be used within a WeeklyPlanningProvider');
+  }
+  
+  return context;
+};

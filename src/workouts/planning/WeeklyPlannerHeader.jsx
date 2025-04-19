@@ -5,11 +5,12 @@ import React from 'react';
  * WeeklyPlannerHeader Component
  * 
  * Displays the days of the week as column headers for the planner
+ * Starting with Sunday as the first day of the week
  */
 const WeeklyPlannerHeader = ({ week }) => {
   // Get day names for the current week
   const getDayNames = () => {
-    const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     
     return week.days.map((day, index) => {
       const date = new Date(day.date);
